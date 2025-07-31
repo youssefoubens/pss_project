@@ -1,0 +1,366 @@
+{
+  "__inputs": [],
+  "__requires": [],
+  "uid": "kafka-worker-enhanced-dashboard",
+  "title": "Kafka Worker Enhanced Metrics",
+  "tags": ["kafka", "prometheus", "worker", "performance"],
+  "timezone": "browser",
+  "schemaVersion": 37,
+  "version": 2,
+  "refresh": "5s",
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "type": "stat",
+      "title": "Current TPS",
+      "targets": [
+        {
+          "expr": "kafka_worker_transactions_per_second",
+          "legendFormat": "TPS",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 10
+              },
+              {
+                "color": "green",
+                "value": 50
+              }
+            ]
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 4 }
+    },
+    {
+      "type": "stat",
+      "title": "CPU Usage %",
+      "targets": [
+        {
+          "expr": "kafka_worker_cpu_usage_percent",
+          "legendFormat": "CPU %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 4 }
+    },
+    {
+      "type": "stat",
+      "title": "Memory Usage %",
+      "targets": [
+        {
+          "expr": "kafka_worker_memory_usage_percent",
+          "legendFormat": "Memory %"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "green",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 75
+              },
+              {
+                "color": "red",
+                "value": 90
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "x": 12, "y": 0, "w": 6, "h": 4 }
+    },
+    {
+      "type": "stat",
+      "title": "Success Rate %",
+      "targets": [
+        {
+          "expr": "rate(kafka_worker_transactions_processed_total[5m]) / (rate(kafka_worker_transactions_processed_total[5m]) + rate(kafka_worker_transactions_failed_total[5m])) * 100",
+          "legendFormat": "Success Rate"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "steps": [
+              {
+                "color": "red",
+                "value": 0
+              },
+              {
+                "color": "yellow",
+                "value": 95
+              },
+              {
+                "color": "green",
+                "value": 99
+              }
+            ]
+          },
+          "unit": "percent"
+        }
+      },
+      "gridPos": { "x": 18, "y": 0, "w": 6, "h": 4 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Transactions Per Second (TPS)",
+      "targets": [
+        {
+          "expr": "kafka_worker_transactions_per_second",
+          "legendFormat": "Current TPS",
+          "interval": ""
+        },
+        {
+          "expr": "rate(kafka_worker_transactions_processed_total[1m])",
+          "legendFormat": "Rate (1m avg)",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "System Resources",
+      "targets": [
+        {
+          "expr": "kafka_worker_cpu_usage_percent",
+          "legendFormat": "CPU Usage %",
+          "interval": ""
+        },
+        {
+          "expr": "kafka_worker_memory_usage_percent",
+          "legendFormat": "Memory Usage %",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "percent",
+          "max": 100
+        }
+      },
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Message Processing Latency",
+      "targets": [
+        {
+          "expr": "rate(kafka_worker_processing_latency_seconds_sum[1m]) / rate(kafka_worker_processing_latency_seconds_count[1m])",
+          "legendFormat": "Average Latency",
+          "interval": ""
+        },
+        {
+          "expr": "histogram_quantile(0.95, rate(kafka_worker_processing_duration_seconds_bucket[1m]))",
+          "legendFormat": "95th Percentile",
+          "interval": ""
+        },
+        {
+          "expr": "histogram_quantile(0.99, rate(kafka_worker_processing_duration_seconds_bucket[1m]))",
+          "legendFormat": "99th Percentile",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Message Throughput (Messages/sec)",
+      "targets": [
+        {
+          "expr": "rate(kafka_worker_messages_consumed_total[1m])",
+          "legendFormat": "Consumed/sec",
+          "interval": ""
+        },
+        {
+          "expr": "rate(kafka_worker_messages_produced_total[1m])",
+          "legendFormat": "Produced/sec",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Transaction Success vs Failures",
+      "targets": [
+        {
+          "expr": "rate(kafka_worker_transactions_processed_total[1m])",
+          "legendFormat": "Successful/sec",
+          "interval": ""
+        },
+        {
+          "expr": "rate(kafka_worker_transactions_failed_total[1m])",
+          "legendFormat": "Failed/sec",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "x": 0, "y": 20, "w": 12, "h": 8 }
+    },
+    {
+      "type": "timeseries",
+      "title": "Processing Queue & Memory",
+      "targets": [
+        {
+          "expr": "kafka_worker_processing_queue_size",
+          "legendFormat": "Queue Size",
+          "interval": ""
+        },
+        {
+          "expr": "kafka_worker_memory_usage_bytes / 1024 / 1024",
+          "legendFormat": "Memory Usage (MB)",
+          "interval": ""
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          }
+        }
+      },
+      "gridPos": { "x": 12, "y": 20, "w": 12, "h": 8 }
+    },
+    {
+      "type": "table",
+      "title": "Current Metrics Summary",
+      "targets": [
+        {
+          "expr": "kafka_worker_transactions_per_second",
+          "legendFormat": "Current TPS",
+          "instant": true
+        },
+        {
+          "expr": "kafka_worker_cpu_usage_percent",
+          "legendFormat": "CPU Usage %",
+          "instant": true
+        },
+        {
+          "expr": "kafka_worker_memory_usage_percent",
+          "legendFormat": "Memory Usage %",
+          "instant": true
+        },
+        {
+          "expr": "kafka_worker_messages_consumed_total",
+          "legendFormat": "Total Messages Consumed",
+          "instant": true
+        },
+        {
+          "expr": "kafka_worker_transactions_processed_total",
+          "legendFormat": "Total Transactions Processed",
+          "instant": true
+        },
+        {
+          "expr": "kafka_worker_transactions_failed_total",
+          "legendFormat": "Total Failed Transactions",
+          "instant": true
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            }
+          }
+        }
+      ],
+      "gridPos": { "x": 0, "y": 28, "w": 24, "h": 6 }
+    }
+  ],
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  }
+}
